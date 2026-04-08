@@ -1,0 +1,1329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<title>The Vault</title>
+<style>
+:root{
+  --bg:#09101c; --bg2:#0e1628; --panel:#111b31; --panel2:#182542; --panel3:#203154;
+  --text:#f6f8fc; --muted:#9eb0ca; --accent:#c8a96b; --accent2:#efd39b; --border:#2a3960;
+  --good:#7ee0b0; --warn:#f0ca6c; --bad:#f79a9a; --shadow:0 10px 30px rgba(0,0,0,.28);
+}
+:root[data-theme="light"]{
+  --bg:#f3f6fb; --bg2:#edf2f9; --panel:#ffffff; --panel2:#edf3fa; --panel3:#e3ebf6;
+  --text:#111827; --muted:#52627a; --accent:#8a5a12; --accent2:#b98020; --border:#cfd8e6;
+  --good:#166534; --warn:#a16207; --bad:#b91c1c; --shadow:0 12px 28px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:
+radial-gradient(circle at top left, rgba(200,169,107,.12), transparent 22%),
+linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text)}
+body{padding-bottom:32px}
+button,input,select,textarea{font:inherit}
+.app{max-width:1400px;margin:0 auto;padding:18px}
+.sticky{position:sticky;top:0;z-index:20;padding-bottom:12px;background:linear-gradient(180deg, rgba(9,16,28,.96), rgba(9,16,28,.84), transparent)}
+:root[data-theme="light"] .sticky{background:linear-gradient(180deg, rgba(243,246,251,.97), rgba(243,246,251,.88), transparent)}
+.topbar{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;flex-wrap:wrap;padding-top:8px}
+.brand small{display:block;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-size:11px}
+.brand h1{margin:.18rem 0;font-size:clamp(28px,4vw,42px);line-height:1.05}
+.brand p{margin:0;color:var(--muted)}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.grid{display:grid;gap:16px}
+.cols-2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.cols-3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.cols-4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:24px;padding:18px;box-shadow:var(--shadow)}
+:root[data-theme="light"] .card{background:linear-gradient(180deg,var(--panel),var(--panel2))}
+.card.soft{background:var(--panel2)}
+.card h3,.card h4{margin:.15rem 0 .5rem 0}
+.kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+.tabs,.subtabs{display:flex;gap:8px;flex-wrap:wrap}
+.btn,.tab,.subtab{appearance:none;border:1px solid var(--border);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:16px;cursor:pointer;transition:.18s transform,.18s background,.18s border-color}
+.btn:hover,.tab:hover,.subtab:hover{transform:translateY(-1px)}
+.tab.active,.subtab.active{background:var(--panel3);border-color:var(--accent);color:var(--text)}
+:root[data-theme="light"] .tab.active,:root[data-theme="light"] .subtab.active{background:#dbe7f7;color:#111827;border-color:var(--accent)}
+.action{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:220px;flex:1}
+label.small{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted)}
+input,select,textarea{width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--border);background:var(--panel2);color:var(--text);outline:none}
+:root[data-theme="light"] input,:root[data-theme="light"] select,:root[data-theme="light"] textarea{background:#fff;color:#111827}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{min-height:110px;resize:vertical}
+.stat{padding:16px;border-radius:22px;border:1px solid var(--border);background:var(--panel2)}
+.stat .num{font-size:30px;font-weight:700;line-height:1.05}
+.pill{display:inline-block;padding:5px 9px;border-radius:999px;border:1px solid var(--border);background:var(--panel3);font-size:12px;margin:2px 6px 2px 0}
+:root[data-theme="light"] .pill{background:#dde7f3}
+.listbtn{width:100%;text-align:left;background:var(--panel2);border:1px solid var(--border);padding:14px;border-radius:18px;color:var(--text);cursor:pointer}
+.listbtn:hover{border-color:var(--accent)}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.hr{height:1px;background:var(--border);margin:12px 0}
+.score.good{color:var(--good)} .score.warn{color:var(--warn)} .score.bad{color:var(--bad)}
+.modal-wrap{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.58);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{width:min(980px,100%);max-height:88vh;overflow:auto;border-radius:28px;border:1px solid var(--border);background:linear-gradient(180deg,var(--panel),var(--panel2));padding:20px;box-shadow:var(--shadow)}
+.smalltxt{font-size:13px}
+.hero{display:grid;grid-template-columns:1.3fr .9fr;gap:16px}
+@media (max-width: 980px){ .hero{grid-template-columns:1fr} }
+.footer-note{text-align:center;color:var(--muted);font-size:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+
+<script>
+const TABS=["Home","Collection","Wear Today","Layering","Display","Buy or Skip"];
+const COLLECTION_VIEWS=["House","DNA","Inspiration","Occasion","Plane"];
+const OCCASIONS=["Travel","Plane","Office","Buttoned Up","Date","Casual","Gym","Outdoors","Evening","Special Event"];
+const ENVIRONMENTS=["Indoors","Mixed","Outdoors"];
+const WEATHER_KEY="vault_weather_pref";
+const WEAR_KEY="vault_wear_log";
+const THEME_KEY="vault_theme_mode";
+
+const COLLECTION=[
+{h:"The Dua Brand",n:"#Imagine",i:"Louis Vuitton Imagination",d:["bright citrus","aromatic","tea","clean musky amber"],o:["Casual","daytime errands"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Acqua Di DUA",i:"Acqua di Gio OG / vintage style",d:["marine","citrus aromatic","watery woods","fresh masculine"],o:["Casual","beach","gym"],s:"Spring · Summer",r:3},
+{h:"The Dua Brand",n:"Bet On 67",i:"Ralph Lauren Polo 67",d:["sporty citrus woods","clean aromatic","easy daytime fresh"],o:["Casual outdoors","sport"],s:"Spring · Summer",r:3},
+{h:"The Dua Brand",n:"Bleu de Casino Elixir Extrait",i:"Bleu de Chanel x Aventus x Baccarat Rouge 540 Extrait",d:["blue incense woods","fruity smoky amber","sweet extrait richness"],o:["Date night","upscale casual"],s:"Fall · Winter",r:5},
+{h:"The Dua Brand",n:"Bleu de Dua Attar",i:"Bleu de Chanel Parfum",d:["deep blue woods","incense","citrus","smooth ambered masculinity"],o:["Office","smart casual"],s:"Year-round",r:5},
+{h:"The Dua Brand",n:"Bleu de Dua Exclusive Extrait",i:"Bleu de Chanel L'Exclusif",d:["elegant blue woods","refined incense","creamy polished depth"],o:["Business formal","special occasion"],s:"Fall · Winter",r:5},
+{h:"The Dua Brand",n:"Casino Royale Nights Extrait",i:"Baccarat Rouge 540 Extrait",d:["saffron amberwood","airy sweetness","glowing woody sugar"],o:["Date night","cocktail event"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"D Le Attar",i:"YSL Y Le Parfum",d:["dark blue aromatic","apple ginger woods","smooth sweet masculine"],o:["Office","date night"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"D Le Parfum Intense",i:"YSL Y Eau de Parfum Intense",d:["vibrant blue aromatic","crisp woods","richer modern freshness"],o:["Evening","formal"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Desert Reflection Extrait",i:"Amouage Reflection Man",d:["creamy white florals","sandalwood","elegant soapy refinement"],o:["Special occasion","formal"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Drowning in Bleu de Dua Attar",i:"Nishane Ani x Bleu de Chanel Parfum",d:["vanillic spicy citrus","blue woods","creamy incense sweetness"],o:["Date night","upscale"],s:"Spring · Fall",r:4},
+{h:"The Dua Brand",n:"Drowning in Bleu de Savage Fierce Extrait",i:"Nishane Ani × Dior Sauvage EDT × Abercrombie Fierce × Bleu de Chanel",d:["sweet spicy blue fresh","musky woods","club-ready hybrid"],o:["Night out","clubbing"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"His Intense Aspiration",i:"Chanel Allure Homme Edition Blanche x Allure Homme Sport Eau Extreme",d:["creamy lemon freshness","sporty woods","smooth musky citrus"],o:["Office","smart casual"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"His Loyalty",i:"D&G Devotion Pour Homme",d:["citrus gourmand aromatic","smooth woods","modern sweet masculine"],o:["Casual","social"],s:"Spring · Summer",r:3},
+{h:"The Dua Brand",n:"Fierce Savage",i:"Abercrombie Fierce x Dior Sauvage EDT",d:["musky fresh citrus","ambroxan","casual loud clean masculine"],o:["Casual","gym","outdoors"],s:"Spring · Summer",r:3},
+{h:"The Dua Brand",n:"His Royalty",i:"Prada L'Homme L'Eau",d:["clean neroli iris","soft soapiness","refined airy office scent"],o:["Office","light date"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Error 410",i:"Paco Rabanne 1 Million Absolutely Gold",d:["sweet gold amber","rich spice","warm evening gloss"],o:["Date night","evening","upscale social"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Error 413",i:"Paco Rabanne 1 Million Lucky",d:["hazelnut plum sweetness","woody amber","playful night out vibe"],o:["Night out","social"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"His Aspiration Extreme Sport",i:"Chanel Allure Homme Sport Eau Extreme",d:["minty tonka citrus","sporty woods","versatile masculine freshness"],o:["Sport","casual","gym"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"His OG Aspiration",i:"Chanel Allure Homme",d:["classic citrus woods","spicy creamy freshness","polished masculine"],o:["Office","smart casual"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"His Perspective",i:"Prada Paradigme",d:["clean aromatic woods","modern masculine freshness","smooth easy wear"],o:["Office","date night","layering base"],s:"Year-round",r:4},
+{h:"The Dua Brand",n:"Iconic Greenwich Village",i:"Bond No. 9 Greenwich Village",d:["fruity musky amber","urban sweet woods","stylish modern scent"],o:["Urban casual","creative social"],s:"Spring · Fall",r:4},
+{h:"The Dua Brand",n:"Imperial Blue",i:"Bleu de Chanel x Creed Millesime Imperial",d:["blue incense","salty melon musk","refined fresh luxury"],o:["Upscale casual","date"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Imperiale Casino Elixir",i:"Creed Millesime Imperial x Aventus x Baccarat Rouge 540 Extrait",d:["fruity marine amber","metallic sweetness","luxe hybrid sheen"],o:["Special occasion","formal"],s:"Spring · Fall",r:4},
+{h:"The Dua Brand",n:"Intuition Vision",i:"Acqua di Gio Profumo",d:["marine incense aromatic","dark mineral freshness","elegant masculinity"],o:["Smart casual","office"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Jazz",i:"Maison Margiela Jazz Club",d:["boozy tobacco vanilla","cozy amber","intimate lounge scent"],o:["Evening social","bar","lounge"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Mystical Amulet of Blue",i:"Ex Nihilo Blue Talisman",d:["sparkling citrus pear freshness","musky amber","upscale clean vibe"],o:["Casual","everyday"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Peace with Poseidon",i:"Bond No. 9 The Scent of Peace for Him x Creed Aventus",d:["bright fruity woods","aromatic freshness","easy compliment getter"],o:["Casual","outdoors","weekend"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Poseidon's Swimming Cologne",i:"Creed Aventus Cologne x Louis Vuitton Afternoon Swim",d:["sparkling citrus musk","fresh pineapple orange","bright summer energy"],o:["Casual","beach","sport","layering base"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Poseidon's Ocean Mist",i:"Creed Aventus Cologne x Nautica Voyage",d:["clean fruity aquatic","airy woods","effortless casual freshness"],o:["Casual","office","daytime","outdoors","weekend"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"River Fougere",i:"YSL Rive Gauche Pour Homme",d:["barbershop fougere","lavender herbs","metallic shaving cream vibe"],o:["Office","smart casual","retro vibe"],s:"Spring · Fall",r:4},
+{h:"The Dua Brand",n:"Rome in Yellow Dream",i:"Valentino Uomo Born in Roma Yellow Dream",d:["citrus gingerbread warmth","sweet aromatic woods","easy date scent"],o:["Date","upscale casual"],s:"Spring · Summer",r:3},
+{h:"The Dua Brand",n:"Spice It Up: Metallic Musk",i:"Viktor & Rolf Spicebomb Metallic Musk",d:["spicy metallic musk","cool aromatic woods","sleek modern warmth"],o:["Smart casual","office"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Stronger With Azure Supernova 2.0",i:"Stronger With You x Acqua di Gio Profondo x Roja Elysium x Aventus",d:["sweet blue aromatic","fruity woods","mass appealing statement hybrid"],o:["Date night","evening"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"The Savage Attar",i:"Dior Sauvage Parfum",d:["smooth spicy citrus","darker woods","richer sauvage DNA"],o:["Date night","upscale casual"],s:"Year-round",r:4},
+{h:"The Dua Brand",n:"Iconic Plums By The Fire",i:"Bond No. 9 Andy Warhol x Maison Margiela By the Fireplace",d:["plum sweetness","smoky chestnut woods","cozy artistic warmth"],o:["Evening","cozy","lounge"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Poseidon's Fireplace",i:"Creed Aventus x Maison Margiela By the Fireplace",d:["fruity smoke","woods","cozy masculine campfire vibe"],o:["Evening","lounge","date"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Dua's SoHo",i:"Bond No. 9 SoHo",d:["fruity floral amber","creative urban sweetness","stylish social scent"],o:["Urban casual","creative social"],s:"Spring · Fall",r:3},
+{h:"The Dua Brand",n:"Gentleman's Club",i:"Givenchy Gentleman Society",d:["aromatic woods","fresh spice","polished modern gentleman profile"],o:["Business casual","date"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"True Self Absolute",i:"YSL MYSLF L'Absolu",d:["orange blossom woods","rich ambers","sleek modern masculinity"],o:["Date night","evening"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Poseidon's Cotton Candy",i:"Creed Aventus x Cotton Candy",d:["fruity woods","spun sugar sweetness","playful casual twist"],o:["Casual","fun social","playful"],s:"Spring · Summer",r:3},
+{h:"The Dua Brand",n:"Dua's Water Primal Essence",i:"Acqua di Gio Absolu",d:["fruity aquatic woods","juicy marine sweetness","wearable everyday fresh"],o:["Office","casual","gym"],s:"Spring · Summer",r:3},
+{h:"The Dua Brand",n:"Rome in Coral Fantasy",i:"Valentino Uomo Born in Roma Coral Fantasy",d:["red apple tobacco sweetness","fruity amber","playful warm-weather date scent"],o:["Date","warm-weather casual"],s:"Spring · Summer",r:3},
+{h:"The Dua Brand",n:"Midnight Candy For 1 & Only",i:"YSL La Nuit de L'Homme x Candies for Men x Dolce & Gabbana The One",d:["sweet spicy cardamom amber","seductive lounge DNA"],o:["Evening","date night","club"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"1 & Only Jazz Club",i:"Dolce & Gabbana The One x Maison Margiela Jazz Club",d:["warm tobacco amber","boozy spice","soft intimate evening scent"],o:["Evening","lounge","date"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Victorian Poseidon",i:"Creed Aventus x Xerjoff 1861 Renaissance",d:["fruity citrus woods","elegant Italian brightness","upscale fresh blend"],o:["Formal","special occasion"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Ottoman Breeze",i:"Nishane Hacivat",d:["pineapple chypre woods","mossy citrus brightness","sharp signature fresh"],o:["Casual","office","everyday","layering base"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Ottomans Vert Breeze",i:"Nishane Hacivat x Creed Green Irish Tweed",d:["green pineapple woods","fresh cut grass","polished outdoor elegance"],o:["Casual","office","outdoors","weekend"],s:"Spring · Summer · Early Fall",r:4},
+{h:"The Dua Brand",n:"Aphrodisiac",i:"Initio Psychedelic Love",d:["powdery floral vanilla","sensual musk","intimate sweet haze"],o:["Date night","intimate","evening"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Black Widow",i:"Kilian Black Phantom",d:["dark rum chocolate coffee","smoky sweetness","mysterious night scent"],o:["Evening","date night","club"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"City of Dua",i:"Louis Vuitton City of Stars",d:["citrus candy amber","radiant night city glow","playful brightness"],o:["Smart casual","evening"],s:"Fall · Winter",r:3},
+{h:"The Dua Brand",n:"Midnight Rendezvous",i:"YSL La Nuit de L'Homme",d:["cardamom lavender woods","soft seductive evening masculinity"],o:["Date night","evening","club"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Gone Swimming",i:"Louis Vuitton Afternoon Swim",d:["orange citrus burst","sparkling aquatic freshness","luxury summer energy"],o:["Casual","beach","poolside"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Cola Fizz Of Tonka Beans",i:"Mancera Tonka Cola",d:["cherry cola fizz","tonka warmth","fun sweet aromatic vibe"],o:["Casual","fun","social"],s:"Year-round",r:3},
+{h:"The Dua Brand",n:"Smoky Cuba Tabac",i:"Alghabra Cuban Tobacco",d:["smoky sweet tobacco","resinous woods","rich lounge warmth"],o:["Evening","lounge","special occasion"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Fortune",i:"Xerjoff Naxos",d:["honey tobacco lavender","sweet aromatic richness","elegant comfort scent"],o:["Date night","evening","romantic"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Supernova Cologne Intense",i:"Roja Elysium Eau Intense",d:["crisp citrus woods","airy musk","luxury blue fresh brightness"],o:["Smart casual","office","gym"],s:"Spring · Summer",r:4},
+{h:"The Dua Brand",n:"Wooden Lucky Charm",i:"Dior Bois Talisman",d:["woody amber","mystical soft sweetness","smooth modern niche feel"],o:["Smart casual","evening"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Rome in Green",i:"Valentino Uomo Born in Roma Green Stravaganza",d:["green aromatic coffee","fresh herbal woods","energetic modern casual"],o:["Casual","outdoors","weekend"],s:"Spring · Summer",r:3},
+{h:"The Dua Brand",n:"Queen Of The Chess",i:"Mind Games Queening",d:["fruity floral amber","upscale seductive sweetness","bold elegant aura"],o:["Date","upscale casual","evening"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"Midnight Fig",i:"Nest Indigo",d:["fig tea spice","dusky sweetness","smooth mysterious comfort scent"],o:["Evening","special occasion","mysterious"],s:"Fall · Winter",r:4},
+{h:"The Dua Brand",n:"The Mobster vs Poseidon",i:"Vintage Roja Creation-E × Creed Aventus",d:["boozy fruity woods","smooth tobacco amber","upscale masculine swagger"],o:["Date night","upscale casual","evening social"],s:"Fall · Spring / cooler evenings",r:4},
+{h:"The Dua Brand",n:"Aroma of Heaven",i:"Hermes Terre d'Hermes vintage style",d:["citrus vetiver mineral woods","mature earthy masculine elegance"],o:["Office","smart casual","daytime","outdoors"],s:"Spring · Fall · Year-round",r:5},
+{h:"The Dua Brand",n:"Imperialé Matrix",i:"Creed Millésime Impérial × Xerjoff Nio",d:["citrus marine musk","green neroli sparkle","polished luxury freshness"],o:["Office","smart casual","daytime","upscale casual","outdoors"],s:"Spring · Summer · Early Fall",r:4},
+
+{h:"Maison Alhambra",n:"Black Origami",i:"Tom Ford Black Orchid",d:["dark floral truffle patchouli","rich gothic sensuality"],o:["Evening","date night","special occasion"],s:"Fall · Winter",r:4},
+{h:"Maison Alhambra",n:"Daring Blue For Life",i:"Dolce & Gabbana Light Blue Forever",d:["grapefruit citrus woods","breezy marine freshness"],o:["Casual","beach","everyday"],s:"Spring · Summer",r:3},
+{h:"Maison Alhambra",n:"Glacier Bold",i:"JPG Le Beau Le Parfum",d:["coconut woods","sweet tropical amber","playful sensual freshness"],o:["Casual","social","gym"],s:"Spring · Summer",r:3},
+{h:"Maison Alhambra",n:"Glacier Le Noir",i:"JPG Le Male Le Parfum",d:["cardamom vanilla woods","dark sweet barbershop vibe"],o:["Date night","club","evening"],s:"Fall · Winter",r:4},
+{h:"Maison Alhambra",n:"Hercules",i:"Parfums de Marly Herod",d:["tobacco cinnamon vanilla","warm regal sweetness"],o:["Evening","formal","date"],s:"Fall · Winter",r:4},
+{h:"Maison Alhambra",n:"Jean Lowe Immortal",i:"Louis Vuitton L'Immensite",d:["ginger grapefruit ambrox freshness","upscale airy masculine"],o:["Smart casual","office","layering base"],s:"Spring · Summer",r:4},
+{h:"Maison Alhambra",n:"Jean Lowe Vibe",i:"Louis Vuitton Pacific Chill",d:["minty fruity citrus","juicy airy spa freshness"],o:["Casual","beach","weekend"],s:"Spring · Summer",r:3},
+{h:"Maison Alhambra",n:"Kismet Angel",i:"Kilian Angel's Share",d:["boozy cinnamon apple pie amber","cozy gourmand luxury"],o:["Evening","date night","cozy lounge"],s:"Fall · Winter",r:4},
+{h:"Maison Alhambra",n:"Perseus",i:"Parfums de Marly Pegasus",d:["almond vanilla metallic woods","polished sweet masculine"],o:["Office","smart casual","date"],s:"Year-round",r:4},
+{h:"Maison Alhambra",n:"Salvo Elixir",i:"Dior Sauvage Elixir",d:["dense spice","lavender woods","loud dark sauvage power"],o:["Date night","evening","special occasion"],s:"Fall · Winter",r:4},
+{h:"Maison Alhambra",n:"Salvo Intense",i:"Dior Sauvage EDP",d:["ambroxan citrus spice","versatile mainstream masculine"],o:["Casual","office","everyday"],s:"Year-round",r:4},
+{h:"Maison Alhambra",n:"Tobacco Touch",i:"Tom Ford Tobacco Vanille",d:["sweet pipe tobacco vanilla","spicy cozy richness"],o:["Evening","cozy","romantic","winter date"],s:"Fall · Winter",r:4},
+{h:"Maison Alhambra",n:"Victorioso",i:"Paco Rabanne Invictus",d:["aquatic bubblegum freshness","sporty youthful energy"],o:["Sport","casual","gym","daytime"],s:"Spring · Summer",r:3},
+{h:"Maison Alhambra",n:"Victorioso Myth",i:"Invictus Legend",d:["salty marine woods","darker sporty masculinity"],o:["Date night","upscale casual"],s:"Fall · Winter",r:3},
+{h:"Maison Alhambra",n:"Victorioso Nero",i:"Invictus Victory / Victory Elixir",d:["sweet amber vanilla","sporty club friendly warmth"],o:["Date night","evening","formal"],s:"Fall · Winter",r:4},
+{h:"Maison Alhambra",n:"Yeah Man",i:"YSL Y Eau de Parfum",d:["apple sage ambrox woods","crowd pleasing blue designer DNA"],o:["Office","casual","everyday"],s:"Year-round",r:4},
+{h:"Maison Alhambra",n:"Your Touch Amber",i:"Armani Stronger With You Amber",d:["sweet amber spice","warm modern date scent"],o:["Date night","cozy evening"],s:"Fall · Winter",r:4},
+{h:"Maison Alhambra",n:"Your Touch Oud",i:"Armani Stronger With You Oud",d:["sweet resinous oud amber","richer evening flanker vibe"],o:["Evening","special occasion","date"],s:"Fall · Winter",r:4},
+{h:"Maison Alhambra",n:"Your Touch Sandal",i:"Armani Stronger With You Sandalwood",d:["creamy sandalwood amber","soft cozy masculine sweetness"],o:["Smart casual","date","evening"],s:"Fall · Winter",r:4},
+
+{h:"Lattafa",n:"Opulent Dubai",i:"Stéphane Humbert Lucas God of Fire",d:["mango ginger tropical heat","juicy citrus woods","bold exotic sweetness"],o:["Special occasion","evening","statement"],s:"Fall · Winter",r:4},
+{h:"Lattafa",n:"Mashrabya",i:"Initio Smoking Hot",d:["apple tobacco smoke","dark boozy sweetness"],o:["Evening","club","date night"],s:"Fall · Winter",r:4},
+{h:"Lattafa",n:"Ameer Al Oudh Intense",i:"Maison Margiela By the Fireplace",d:["burnt woods vanilla","smoky cozy fireside warmth"],o:["Cozy evening","lounge","layering"],s:"Fall · Winter",r:4},
+{h:"Lattafa",n:"Vintage Radio",i:"Initio Paragon",d:["plum palo santo woods","smooth spiritual spicy sweetness"],o:["Date night","evening","special occasion"],s:"Fall · Winter",r:4},
+{h:"Lattafa",n:"Najdia Intense",i:"JPG Le Beau Paradise Garden",d:["green tropical sweetness","coconut freshness","playful vacation energy"],o:["Casual","daytime","social"],s:"Spring · Summer",r:3},
+{h:"Lattafa",n:"Qaed Al Fursan",i:"Creed Aventus",d:["pineapple woods","smoky fruity masculine","affordable aventus lane"],o:["Office","smart casual","daytime"],s:"Spring · Fall",r:3},
+{h:"Lattafa",n:"Hayaati Gold Elixir",i:"Armani Code Profumo",d:["sweet tonka amber","spicy mandarin warmth","seductive evening depth"],o:["Date night","evening","club"],s:"Fall · Winter",r:4},
+{h:"Lattafa",n:"Ana Abiyedh White Musk",i:"Original",d:["soft white musk","airy clean sweetness","skin-scent minimalism"],o:["Casual","office","everyday","skin scent"],s:"Year-round",r:3},
+{h:"Lattafa",n:"Teriaq Intense",i:"Original",d:["dense sweet amber spice","bold statement gourmand"],o:["Evening","statement","bold"],s:"Fall · Winter",r:4},
+{h:"Lattafa",n:"Liam Grey",i:"BDK Gris Charnel",d:["fig black tea woods","creamy cardamom elegance"],o:["Smart casual","date","minimalist chic"],s:"Fall · Winter",r:4},
+{h:"Lattafa",n:"Opulent Musk",i:"Baccarat Rouge 540 x Initio Instant Crush",d:["sweet saffron amber","loud synthetic woody sugar"],o:["Date night","social","evening"],s:"Year-round",r:4},
+{h:"Lattafa",n:"Bade'e Al Oud For Glory",i:"Initio Oud for Greatness",d:["saffron oud lavender","bold dark niche aura"],o:["Special occasion","evening","statement"],s:"Fall · Winter",r:4},
+{h:"Lattafa",n:"Bade'e Al Oud Sublime",i:"Kayali Eden Juicy Apple",d:["juicy apple fruity sweetness","playful bright modern vibe"],o:["Casual","fun","social","daytime"],s:"Spring · Summer",r:3},
+{h:"Lattafa",n:"Bade'e Al Oud Honor & Glory",i:"Original / house style",d:["pineapple creme brulee woods","sweet creamy statement scent"],o:["Evening","statement","bold"],s:"Fall · Winter",r:4},
+{h:"Lattafa",n:"Bade'e Al Oud Amethyst",i:"Initio Atomic Rose",d:["rose vanilla amber","lush floral richness"],o:["Date night","floral evening","romantic"],s:"Spring · Fall",r:4},
+{h:"Lattafa",n:"Khamrah Qahwa",i:"Original",d:["coffee cinnamon praline amber","cozy sweet gourmand"],o:["Cozy","evening","lounge","cold weather treat"],s:"Fall · Winter",r:4},
+
+{h:"Fragrance World",n:"Suits",i:"YSL Tuxedo",d:["patchouli amber spice","elegant dressed up luxury"],o:["Formal","evening","special occasion"],s:"Fall · Winter",r:5},
+{h:"Fragrance World",n:"Lust Cherry",i:"Tom Ford Lost Cherry",d:["boozy cherry almond sweetness","playful seductive gourmand"],o:["Date night","evening","romantic"],s:"Fall · Winter",r:4},
+{h:"Fragrance World",n:"Intense Peach",i:"Tom Ford Bitter Peach",d:["ripe peach rum woods","bold sweet fruit"],o:["Evening","bold social","date"],s:"Fall · Winter",r:4},
+{h:"Fragrance World",n:"Oud Wonder",i:"Tom Ford Oud Wood",d:["soft oud woods spice","polished refined masculinity"],o:["Smart casual","office","date"],s:"Fall · Winter",r:4},
+{h:"Fragrance World",n:"Ebony Fume",i:"Tom Ford Ebene Fume",d:["incense palo santo woods","smoky meditative warmth"],o:["Evening","formal","special occasion"],s:"Fall · Winter",r:4},
+{h:"Fragrance World",n:"Proud of You",i:"Armani Stronger With You",d:["chestnut vanilla spice","cozy modern sweetness"],o:["Office","casual","everyday"],s:"Fall · Winter",r:3},
+{h:"Fragrance World",n:"Proud of You Absolute",i:"Armani Stronger With You Absolutely",d:["boozy chestnut amber","richer sweeter date night warmth"],o:["Date night","evening","upscale"],s:"Fall · Winter",r:4},
+{h:"Fragrance World",n:"La Uno Million Elixir",i:"Paco Rabanne 1 Million Elixir",d:["sweet apple vanilla woods","thick golden club scent"],o:["Date night","club","evening"],s:"Fall · Winter",r:4},
+{h:"Fragrance World",n:"Neroli Riviera",i:"Tom Ford Neroli Portofino",d:["neroli citrus musk","luxe Mediterranean freshness"],o:["Casual","beach","vacation","daytime"],s:"Spring · Summer",r:4},
+
+{h:"Banana Republic",n:"Grassland",i:"Creed Green Irish Tweed style",d:["green aromatic woods","grassy clean upscale freshness"],o:["Smart casual","office","daytime"],s:"Spring · Summer",r:4},
+{h:"Banana Republic",n:"Linen Vetiver",i:"Original",d:["dry vetiver citrus","minimalist clean sophistication"],o:["Office","minimalist casual","summer work"],s:"Spring · Summer",r:4},
+{h:"Banana Republic",n:"Vintage Green 78",i:"Original",d:["green woody aromatic","airy relaxed spring freshness"],o:["Casual","weekend","outdoors"],s:"Spring · Summer",r:3},
+{h:"Banana Republic",n:"Tobacco & Tonka Bean",i:"Original",d:["sweet tonka tobacco warmth","cozy casual richness"],o:["Cozy evening","lounge","casual date"],s:"Fall · Winter",r:4},
+{h:"Banana Republic",n:"Midnight Hour",i:"Original",d:["dark woody amber","smooth evening casual depth"],o:["Evening","date","social"],s:"Fall · Winter",r:4},
+{h:"Banana Republic",n:"Dark Cherry & Amber",i:"Original",d:["dark cherry amber","smooth sweetness","cozy evening warmth"],o:["Date night","cozy evening"],s:"Fall · Winter",r:4},
+{h:"Banana Republic",n:"Metal Rain",i:"Original",d:["cool metallic woods","rain-soaked freshness","airy modern green"],o:["Casual","outdoors","fresh air vibe"],s:"Spring · Summer",r:4},
+
+{h:"Designer Originals",n:"Bleu de Chanel EDT",i:"Original",d:["citrus incense woods","crisp blue freshness","versatile polished masculine"],o:["Versatile","office","casual","date"],s:"Year-round",r:5},
+{h:"Designer Originals",n:"Montblanc Legend Spirit",i:"Original",d:["clean fruity musk","airy aquatic woods","easy everyday freshness"],o:["Casual","sport","everyday"],s:"Spring · Summer",r:3},
+{h:"Designer Originals",n:"Nautica Voyage",i:"Original",d:["watery green apple","breezy musk","casual gym freshness"],o:["Casual","fresh","everyday","gym"],s:"Spring · Summer",r:3},
+{h:"Designer Originals",n:"Dior Sauvage EDP",i:"Original",d:["ambroxan spice","bergamot woods","bold versatile masculine"],o:["Office","casual","date night"],s:"Year-round",r:4},
+{h:"Designer Originals",n:"Davidoff Cool Water",i:"Original",d:["minty aquatic lavender","marine freshness","classic sporty clean"],o:["Casual","sport","gym","beach"],s:"Spring · Summer",r:3},
+
+{h:"Valencia / Millionaire",n:"Valencia Uomo Intense",i:"Valentino Uomo Intense",d:["iris leather vanilla","smooth powdery warmth","classy evening depth"],o:["Date night","evening","romantic"],s:"Fall · Winter",r:4},
+{h:"Valencia / Millionaire",n:"Valencia Uomo Fantasy",i:"Valentino Uomo Born in Roma Coral Fantasy",d:["fruity red apple amber","playful sweet woods","casual date energy"],o:["Casual","daytime","warm weather"],s:"Spring · Summer",r:3},
+{h:"Valencia / Millionaire",n:"Valencia Uomo",i:"Valentino Uomo Born in Roma",d:["violet leaf mineral woods","modern sweet aromatic","youthful versatility"],o:["Casual","smart casual","daytime"],s:"Spring · Summer",r:3},
+{h:"Valencia / Millionaire",n:"Millionaire Royal",i:"Paco Rabanne 1 Million Royal",d:["lavender benzoin woods","fresh spicy amber","dressed-up nightlife appeal"],o:["Date night","club","evening"],s:"Fall · Winter",r:4},
+
+{h:"Khadlaj",n:"Island Dreams",i:"Louis Vuitton Symphony",d:["sparkling citrus musk","bright luxury freshness","clean upscale airiness"],o:["Upscale casual","date","evening"],s:"Spring · Fall",r:4},
+{h:"Khadlaj",n:"Shiyaaka Snow",i:"Louis Vuitton Météore",d:["citrus pepper neroli","bright clean woods","elegant daytime freshness"],o:["Smart casual","office","daytime"],s:"Spring · Summer",r:4},
+{h:"Khadlaj",n:"Shiyaaka Blue",i:"Bleu de Chanel style",d:["blue citrus woods","incense-lite freshness","clean office versatility"],o:["Office","casual","everyday"],s:"Year-round",r:4},
+{h:"Khadlaj",n:"Epoque Artistique",i:"Invictus Victory / Victory Elixir",d:["sweet vanilla amber","sporty freshness","bold night-out energy"],o:["Date night","evening","formal"],s:"Fall · Winter",r:4},
+
+{h:"Mod Fragrances",n:"Haven Eclipse",i:"Xerjoff Torino 22",d:["minty aromatic woods","bright freshness","upscale sporty elegance"],o:["Smart casual","date","evening"],s:"Fall · Winter",r:4},
+{h:"Mod Fragrances",n:"Secret Embers",i:"Initio Side Effect",d:["boozy cinnamon tobacco","dark amber woods","seductive evening heat"],o:["Date night","evening","seductive"],s:"Fall · Winter",r:4},
+{h:"Mod Fragrances",n:"Musk Melody",i:"Initio Musk Therapy",d:["clean white musk","citrus softness","calming skin-scent freshness"],o:["Casual","skin-close","everyday"],s:"Year-round",r:4},
+{h:"Mod Fragrances",n:"Reverence Extrait",i:"Parfums de Marly Percival",d:["fresh aromatic citrus","lavender woods","upscale clean versatility"],o:["Smart casual","office","date"],s:"Spring · Fall",r:4},
+{h:"Mod Fragrances",n:"The Exposed Extrait",i:"Mind Games En Prise",d:["dark fruity woods","spicy amber","statement evening richness"],o:["Evening","bold","statement"],s:"Fall · Winter",r:4},
+
+{h:"Rasasi",n:"Fattan",i:"Hermès Terre d’Hermès",d:["orange vetiver woods","dry mineral earthiness","smart casual elegance"],o:["Office","casual","everyday"],s:"Year-round",r:5},
+{h:"Rasasi",n:"Hawas Ice",i:"Original",d:["icy fruity aquatic","musky freshness","loud sporty summer energy"],o:["Sport","gym","casual","fresh"],s:"Spring · Summer",r:3},
+{h:"Rasasi",n:"Hawas Kobra",i:"Louis Vuitton Imagination",d:["soapy citrus tea","musky freshness","bright modern easy wear"],o:["Casual","daytime","social"],s:"Spring · Summer",r:4},
+
+{h:"Zimaya",n:"Itqan Noir",i:"YSL MYSLF",d:["clean orange blossom woods","smooth ambrox freshness","modern masculine ease"],o:["Smart casual","date","evening"],s:"Fall · Winter",r:4},
+{h:"Zimaya",n:"Reverie Aqua Pour Homme",i:"Valentino Uomo Born in Roma Intense",d:["sweet lavender vanilla woods","plush amber","dressed-up warmth"],o:["Casual","office","daytime"],s:"Spring · Summer",r:3},
+{h:"Zimaya",n:"Abadi Opulent",i:"YSL Y Elixir",d:["rich blue aromatic amber","sweet woods","powerful evening polish"],o:["Date night","upscale casual","evening"],s:"Fall · Winter",r:4},
+
+{h:"Yom & Layl",n:"Wazir",i:"Mind Games Queening",d:["luxurious fruity florals","ambered woods","elegant evening character"],o:["Date","upscale casual","evening"],s:"Fall · Winter",r:4},
+{h:"Yom & Layl",n:"Raazi",i:"Mind Games J'Adoube",d:["spiced fruity amber","smooth woods","refined social warmth"],o:["Smart casual","social","evening"],s:"Fall · Winter",r:4},
+{h:"Yom & Layl",n:"Rayees",i:"Mind Games Grand Masters",d:["aromatic woods","polished freshness","intellectual upscale versatility"],o:["Office","smart casual","daytime"],s:"Spring · Fall",r:4},
+{h:"Yom & Layl",n:"Nor",i:"Mind Games Lionora",d:["fresh airy florals","soft woods","clean spring elegance"],o:["Casual","fresh","daytime"],s:"Spring · Summer",r:3},
+{h:"Yom & Layl",n:"Limitless",i:"Mind Games Blockade",d:["green mango woods","vibrant freshness","bold modern statement"],o:["Evening","bold","statement"],s:"Fall · Winter",r:3},
+{h:"Yom & Layl",n:"Gladiator",i:"Argos Triumph of Bacchus",d:["fruity boozy tobacco","dense vanilla amber","grand dramatic richness"],o:["Special occasion","evening","grand statement"],s:"Fall · Winter",r:4},
+
+{h:"Armaf",n:"Le Parfait",i:"Creed Aventus × Creed Green Irish Tweed",d:["pineapple green woods","fresh smoky moss","classic masculine hybrid"],o:["Office","smart casual","daytime"],s:"Spring · Summer",r:4},
+{h:"Armaf",n:"Club de Nuit Milestone",i:"Creed Millésime Impérial",d:["salty melon musk","metallic marine freshness","beach-luxury vibe"],o:["Smart casual","beach","summer date"],s:"Spring · Summer",r:3},
+
+{h:"Anti Social Parfum Club",n:"Most Wanted",i:"Azzaro The Most Wanted",d:["toffee cardamom woods","sweet amber spice","club-ready warmth"],o:["Date night","casual evening","social"],s:"Fall · Winter",r:4},
+{h:"Afnan",n:"Supremacy Collector's Edition",i:"Creed Aventus Absolu",d:["fruity smoky woods","richer aventus DNA","smooth dark polish"],o:["Smart casual","office","date"],s:"Spring · Fall",r:4},
+{h:"Ajmal",n:"Evoke Gold",i:"Prada L’Homme",d:["clean neroli iris","powdery soapiness","refined office elegance"],o:["Office","smart casual","everyday"],s:"Year-round",r:4},
+{h:"Al Haramain",n:"Detour Noir",i:"Parfums de Marly Layton",d:["apple vanilla spice","smooth woods","versatile cool-weather richness"],o:["Date night","office","versatile dresser"],s:"Fall · Winter",r:4},
+{h:"Crown / Al-Rehab",n:"Silver (oil)",i:"Creed Silver Mountain Water",d:["inky citrus musk","cool tea freshness","crisp mountain-clean vibe"],o:["Casual","fresh","gym","daytime"],s:"Spring · Summer",r:4},
+{h:"Atralia",n:"Amazonas Avalanche",i:"Dior Homme Intense",d:["iris cacao woods","velvety powder","formal evening elegance"],o:["Date night","evening","formal"],s:"Fall · Winter",r:4},
+{h:"French Avenue",n:"Liquid Brun",i:"Parfums de Marly Althaïr",d:["vanilla cinnamon amber","creamy woods","luxurious cozy sweetness"],o:["Smart casual","date","evening"],s:"Fall · Winter",r:4},
+{h:"Game of Spades",n:"Wildcard",i:"Bond No. 9 Lafayette Street",d:["fruity amber woods","urban sweet spice","nightlife swagger"],o:["Urban social","evening","creative"],s:"Fall · Winter",r:4},
+{h:"Grandeur",n:"Iconic Built",i:"YSL Bleu Électrique",d:["lavender cardamom woods","blue-night sensuality","smooth evening freshness"],o:["Club","night out","bold evening"],s:"Fall · Winter",r:4},
+{h:"Paris Corner",n:"Rifaqat",i:"YSL Babycat",d:["vanilla suede incense","smoky amber warmth","cozy sensual depth"],o:["Casual","cozy","skin-close everyday"],s:"Fall · Winter",r:4},
+{h:"Rayhaan",n:"Aquatica",i:"Creed Virgin Island Water",d:["lime coconut rum freshness","tropical breezy sweetness","vacation energy"],o:["Beach","vacation","casual summer"],s:"Spring · Summer",r:3},
+{h:"Royalty by Maluma",n:"Onyx",i:"Paco Rabanne 1 Million Privé style",d:["sweet spicy amber","tobacco-cinnamon warmth","plush night-out feel"],o:["Date night","club","evening"],s:"Fall · Winter",r:4},
+{h:"Vurv",n:"Royce Black",i:"Paco Rabanne 1 Million Privé style",d:["sweet spicy amber","woody tobacco warmth","cozy seductive depth"],o:["Date night","club","evening"],s:"Fall · Winter",r:4},
+
+{h:"MIRIS Oils",n:"MIRIS No54602",i:"Nishane Hacivat",d:["pineapple chypre woods","bright mossy citrus","crisp upscale freshness"],o:["Casual","office","everyday","layering"],s:"Spring · Summer",r:3},
+{h:"MIRIS Oils",n:"MIRIS No56902",i:"Kilian Apple Brandy on the Rocks",d:["boozy apple woods","chilled sweetness","cozy social richness"],o:["Cozy evening","social","casual date"],s:"Fall · Winter",r:3},
+{h:"MIRIS Oils",n:"MIRIS No47319",i:"JPG Ultra Male",d:["pear vanilla spice","loud club sweetness","playful seductive energy"],o:["Night out","club","date"],s:"Fall · Winter",r:3},
+{h:"MIRIS Oils",n:"MIRIS No59797",i:"Carolina Herrera Bad Boy Cobalt Parfum Électrique",d:["plum lavender woods","mineral sweetness","modern electric masculinity"],o:["Date night","evening","bold"],s:"Fall · Winter",r:3}
+];
+
+const RECOMMENDATION_WEIGHTS={
+  Travel:{fresh:3,clean:3,aquatic:2,citrus:2,woody:1,blue:1},
+  Plane:{clean:5,fresh:4,woody:3,musk:3,citrus:2,vetiver:3,earthy:2,herbal:2,mineral:2,tea:2,soap:2,aquatic:1,blue:1,floral:1,amber:-4,tobacco:-5,oud:-5,gourmand:-4,dark:-4,smoky:-5,loud:-4,sweet:-3},
+  Office:{clean:4,woody:3,fresh:3,musk:2,vetiver:2,fougere:2,blue:1,earthy:1,mineral:1,amber:-1},
+  "Buttoned Up":{woody:4,clean:3,musk:3,vetiver:2,fougere:2,incense:1,blue:1,amber:1,sweet:-1},
+  Date:{amber:3,woody:2,musk:2,spice:2,vanilla:1,fresh:1,boozy:1},
+  Casual:{fresh:3,woody:2,clean:2,citrus:2,blue:1,green:1},
+  Gym:{clean:4,fresh:4,citrus:3,aquatic:2,blue:2,musk:2,green:1,amber:-3,sweet:-3,boozy:-4,dark:-4},
+  Outdoors:{fresh:3,green:3,citrus:2,aquatic:2,woody:1},
+  Evening:{amber:3,woody:2,spice:2,gourmand:2,dark:2,boozy:2},
+  SpecialEvent:{amber:3,woody:3,musk:2,spice:2,incense:2,dark:1,floral:1}
+};
+
+const state={
+  tab:"Home",
+  theme:(()=>{try{return localStorage.getItem(THEME_KEY)||"dark"}catch(e){return"dark"}})(),
+  weather:{loading:true,error:"",temp:null,wind:null,code:null,city:"Your area"},
+  weatherPref:(()=>{try{return JSON.parse(localStorage.getItem(WEATHER_KEY))||{mode:"auto",city:""}}catch(e){return{mode:"auto",city:""}}})(),
+  collectionView:"House",
+  collectionSearch:"",
+  collectionGroup:"",
+  selectedFragrance:null,
+  homeOccasion:"Office",
+  homeEnvironment:"Mixed",
+  wearOccasion:"Office",
+  wearEnvironment:"Mixed",
+  wearSelected:COLLECTION[0]?.n||"",
+  wearAmount:"",
+  wearNotes:"",
+  wearLog:(()=>{try{return JSON.parse(localStorage.getItem(WEAR_KEY))||[]}catch(e){return[]}})(),
+  layerBase:COLLECTION[0]?.n||"",
+  layerTop:COLLECTION[1]?.n||COLLECTION[0]?.n||"",
+  layerBaseQuery:"",
+  layerTopQuery:"",
+  layerOccasion:"Office",
+  layerEnvironment:"Mixed",
+  displaySeasonMode:"Auto",
+  buy:{name:"",house:"",inspiration:"",dna:"",occasions:"",season:"All Season"}
+};
+
+function saveTheme(){ localStorage.setItem(THEME_KEY,state.theme); }
+function saveWeatherPref(){ localStorage.setItem(WEATHER_KEY,JSON.stringify(state.weatherPref)); }
+function saveWearLog(){ localStorage.setItem(WEAR_KEY,JSON.stringify(state.wearLog)); }
+
+function esc(s){ return String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;"); }
+function norm(s){ return String(s||"").toLowerCase().trim(); }
+function dnatags(f){ return (f.d||[]).map(norm); }
+function isOil(f){ return /oil/i.test(f.h||"") || /oil/i.test(f.n||""); }
+
+function simplifyDNAList(tags){
+  const raw = (tags||[]).map(norm);
+  const out = [];
+  const add = x => { if (x && !out.includes(x)) out.push(x); };
+  const hasAny = (text, words) => words.some(word => text.includes(word));
+
+  raw.forEach(t => {
+    if (hasAny(t, [
+      "fresh","clean","airy","soap","soapy","tea","breezy","crisp","icy","watery","mountain-clean","easy wear","easy daytime fresh",
+      "bright","sparkling","spring elegance","everyday fresh","luxury freshness","clean vibe","skin-scent","freshness"
+    ])) add("Fresh");
+
+    if (hasAny(t, [
+      "citrus","orange","grapefruit","bergamot","lemon","lime","mandarin","neroli","orange blossom","citrus burst","citrus woods",
+      "citrus aromatic","citrus musk","pineapple orange","ginger grapefruit","minty fruity citrus","juicy citrus","bright citrus"
+    ])) add("Citrus");
+
+    if (hasAny(t, [
+      "aquatic","marine","watery","salty","ocean","beach","poolside","sea","melon musk","marine sweetness","breezy marine",
+      "sparkling aquatic","fruity aquatic","watery woods"
+    ])) add("Aquatic");
+
+    if (hasAny(t, [
+      "blue","blue incense","blue woods","blue aromatic","blue fresh","blue designer","modern blue","blue-night"
+    ])) add("Blue");
+
+    if (hasAny(t, [
+      "green","grassy","grass","green tea","green pineapple","fresh cut grass","green aromatic","mossy","moss","minty","herbal"
+    ])) add("Green");
+
+    if (hasAny(t, [
+      "woods","woody","wood","sandalwood","cedar","patchouli","palo santo","creamy woods","dark woody","italian brightness",
+      "refined fresh luxury","smooth woods","soft woods","elegant woods","luxury woods"
+    ])) add("Woody");
+
+    if (hasAny(t, [
+      "vetiver","earthy","mineral","earthiness","mineral freshness","mineral woods","dry mineral","earthy masculine","soil"
+    ])) add("Vetiver / Earthy");
+
+    if (hasAny(t, [
+      "fougere","barbershop","shaving cream","lavender herbs","aromatic","aromatic woods","sporty elegance","modern gentleman",
+      "classic masculine","polished masculine","retro vibe","lavender"
+    ])) add("Fougere");
+
+    if (hasAny(t, [
+      "musk","musky","musky amber","musky citrus","powdery","powder","iris","soft soapiness","powdery soapiness","white musk",
+      "velvety powder","smooth easy wear","soft musk","clean white musk"
+    ])) add("Musk / Powdery");
+
+    if (hasAny(t, [
+      "amber","ambered","amberwood","ambered masculinity","amber warmth","rich ambers","gold amber","saffron amber",
+      "smooth amber","amber spice","warmth","benzoin","resinous","incense","glowing woody sugar"
+    ])) add("Amber");
+
+    if (hasAny(t, [
+      "sweet","sweetness","vanilla","sugary","sugar","cotton candy","playful sweet","sweet masculine","sweet aromatic","sweet woods",
+      "sweet spicy","hazelnut","toffee","honey","praline","apple pie","spun sugar","creme brulee","richness"
+    ])) add("Sweet");
+
+    if (hasAny(t, [
+      "spice","spicy","cardamom","cinnamon","pepper","ginger","gingerbread","saffron","warm spicy","spicebomb"
+    ])) add("Spicy");
+
+    if (hasAny(t, [
+      "gourmand","coffee","chocolate","caramel","dessert","boozy","rum","chestnut","pie","cola","tonka","tobacco vanilla",
+      "apple pie","cozy gourmand","cherry cola","cacao","burnt woods vanilla","boozy cinnamon","boozy apple"
+    ])) add("Gourmand");
+  });
+
+  return out.length ? out.slice(0,7) : ["Fresh"];
+}
+
+function simplifyOccasionList(occasions, dnaTags){
+  const raw = (occasions||[]).map(norm);
+  const dna = (dnaTags||[]).map(norm);
+  const out = [];
+  const add = x => { if (x && !out.includes(x)) out.push(x); };
+
+  raw.forEach(o => {
+    if (/office|work|business/.test(o)) add("Office");
+    if (/date|romantic/.test(o)) add("Date");
+    if (/casual|weekend|everyday|daytime|social|outdoors|outdoor|beach|vacation|fresh|smart casual|versatile/.test(o)) add("Casual");
+    if (/evening|night|formal|special occasion|special|cocktail|upscale|club|lounge|bar|statement/.test(o)) add("Evening");
+    if (/gym|sport|poolside/.test(o)) add("Gym");
+  });
+
+  if (!out.length){
+    if (dna.some(x => ["fresh","clean","citrus","aquatic","marine","blue","green","tea","soap","airy"].includes(x))) add("Casual");
+    if (dna.some(x => ["amber","sweet","vanilla","boozy","spice","gourmand","dark","tobacco","oud"].includes(x))) add("Evening");
+    if (dna.some(x => ["musk","fougere","woody","vetiver","iris","neroli","lavender","powdery"].includes(x))) add("Office");
+  }
+
+  if (!out.includes("Gym") && dna.some(x => ["fresh","clean","aquatic","marine","citrus","blue"].includes(x)) && raw.some(o => /casual|sport|everyday|gym/.test(o))) add("Gym");
+  return out.length ? out.slice(0,4) : ["Casual"];
+}
+
+function displayDNAList(f){ return simplifyDNAList(f.d||[]); }
+function displayOccasionList(f){ return simplifyOccasionList(f.o||[], f.d||[]); }
+
+function getWeatherLabel(code){
+  if (code===0) return "Clear";
+  if ([1,2,3].includes(code)) return "Partly cloudy";
+  if ([45,48].includes(code)) return "Fog";
+  if ([51,53,55,56,57].includes(code)) return "Drizzle";
+  if ([61,63,65,66,67].includes(code)) return "Rain";
+  if ([71,73,75,77].includes(code)) return "Snow";
+  if ([80,81,82].includes(code)) return "Showers";
+  if ([95,96,99].includes(code)) return "Thunderstorm";
+  return "Current conditions";
+}
+
+function countByHouse(){
+  const m = new Map();
+  COLLECTION.forEach(f => m.set(f.h, (m.get(f.h)||0)+1));
+  return [...m.entries()].sort((a,b)=>b[1]-a[1]);
+}
+
+function scoreFragrance(f, weights, weather=null, environment="Mixed"){
+  const dna = dnatags(f);
+  let score = f.r || 0;
+  dna.forEach(tag => score += (weights[tag]||0));
+  const season = norm(f.s);
+  const temp = weather && typeof weather.temp === "number" ? weather.temp : null;
+  if (temp !== null){
+    if (temp <= 55){
+      if (/fall|winter|year-round/.test(season)) score += 2;
+      if (/spring · summer|spring|summer/.test(season)) score -= 2;
+      if (dna.includes("fresh")) score += environment==="Indoors" ? 0 : -2;
+      if (dna.includes("aquatic") || dna.includes("marine")) score += environment==="Indoors" ? -1 : -3;
+      if (dna.includes("amber") || dna.includes("woody") || dna.includes("spice")) score += 2;
+      if (dna.includes("vetiver") || dna.includes("earthy") || dna.includes("mineral")) score += 1;
+    }
+    if (temp >= 82){
+      if (/spring|summer|year-round/.test(season)) score += 2;
+      if (/fall|winter/.test(season)) score -= 2;
+      if (dna.includes("fresh") || dna.includes("citrus") || dna.includes("clean") || dna.includes("aquatic")) score += environment==="Indoors" ? 1 : 3;
+      if (dna.includes("oud") || dna.includes("tobacco") || dna.includes("gourmand") || dna.includes("dark")) score -= environment==="Indoors" ? 1 : 4;
+    }
+  }
+  if (environment === "Indoors"){
+    if (dna.some(x=>["clean","musk","woody","vetiver","fougere","tea","soap"].includes(x))) score += 1;
+    if (dna.some(x=>["dark","smoky","loud"].includes(x))) score -= 2;
+  }
+  return score;
+}
+
+function getWeatherAdjustedWeights(baseWeights, weather){
+  const w = {...baseWeights};
+  const temp = weather && typeof weather.temp === "number" ? weather.temp : null;
+  if (temp !== null){
+    if (temp <= 55){ w.amber=(w.amber||0)+2; w.woody=(w.woody||0)+1; w.spice=(w.spice||0)+1; w.fresh=(w.fresh||0)-1; w.aquatic=(w.aquatic||0)-2; }
+    if (temp >= 82){ w.fresh=(w.fresh||0)+2; w.clean=(w.clean||0)+1; w.citrus=(w.citrus||0)+1; w.amber=(w.amber||0)-2; w.oud=(w.oud||0)-3; w.tobacco=(w.tobacco||0)-3; }
+  }
+  return w;
+}
+
+function pickTop(items, weights, count=3, weather=null, environment="Mixed"){
+  const ranked = [...items]
+    .map(item=>({item, score: scoreFragrance(item, weights, weather, environment)}))
+    .sort((a,b)=>b.score-a.score);
+  const out = [];
+  const seen = new Set();
+  for (const row of ranked){
+    if (seen.has(row.item.n)) continue;
+    seen.add(row.item.n);
+    out.push(row.item);
+    if (out.length >= count) break;
+  }
+  return out;
+}
+
+function getAdvisorLabel(i){ return ["Safest","Most unique","Best performer","Strong backup","Fifth option"][i] || `Pick ${i+1}`; }
+
+function isPlaneSafeFragrance(f){
+  const dna = dnatags(f);
+  const season = norm(f.s);
+  const occasions = (f.o||[]).map(norm);
+  const tooHeavy = dna.some(x=>["oud","tobacco","gourmand","dark","smoky","loud","statement","bold"].includes(x));
+  const tooSweet = dna.filter(x=>["sweet","amber","vanilla","boozy"].includes(x)).length >= 2;
+  const officeLike = occasions.some(x=>/office|casual|daytime|smart casual|everyday|versatile/.test(x));
+  const safeDNA = dna.some(x=>["clean","musk","woody","vetiver","fresh","citrus","blue","aquatic","earthy","herbal","mineral","tea","soap"].includes(x));
+  if (tooHeavy) return false;
+  if (tooSweet && !dna.some(x=>["clean","musk","vetiver","earthy","tea","soap"].includes(x))) return false;
+  if (/fall|winter/.test(season) && !safeDNA && !officeLike) return false;
+  return safeDNA || officeLike;
+}
+
+function getPlaneSafePicks(items, weather, environment, count=5){
+  const pool = items.filter(isPlaneSafeFragrance);
+  const source = pool.length ? pool : items;
+  const weights = getWeatherAdjustedWeights(RECOMMENDATION_WEIGHTS.Plane, weather);
+  return pickTop(source, weights, count, weather, environment);
+}
+
+function getSprayAdvice(f, occasion){
+  const dna = dnatags(f);
+  const rich = dna.some(x=>["amber","oud","tobacco","oriental","gourmand","dark","sweet","smoky","boozy"].includes(x));
+  if (isOil(f)){
+    if (occasion === "Plane") return rich ? "Apply 1 small dab only, on chest." : "Apply 1 to 2 very small dabs, kept close to skin.";
+    if (occasion === "Office") return rich ? "Apply 1 small dab to chest or inner wrist." : "Apply 2 small dabs max, kept controlled.";
+    if (occasion === "Date") return rich ? "Apply 2 small dabs, chest and one wrist." : "Apply 2 to 3 small dabs for a closer scent bubble.";
+    if (occasion === "Special Event" || occasion === "Evening") return rich ? "Apply 2 to 3 small dabs max, kept refined." : "Apply 2 small dabs for a polished presence.";
+    return rich ? "Apply 1 to 2 small dabs as a safe default." : "Apply 2 small dabs as a safe default.";
+  }
+  if (occasion === "Plane") return rich ? "1 spray max on chest only. Skip shirt and neck for enclosed seating." : "1 to 2 sprays max. Keep it close to skin and avoid overspraying.";
+  if (occasion === "Office") return rich ? "2 sprays. Keep it controlled for office wear." : "3 sprays. Chest, neck, and one light shirt spray.";
+  if (occasion === "Buttoned Up") return rich ? "2 to 3 sprays max. Keep it polished and refined." : "3 sprays. Clean, tailored, and controlled.";
+  if (occasion === "Date") return rich ? "4 sprays. Chest, both sides of neck, one wrist." : "3 sprays. Chest and neck for a closer scent bubble.";
+  if (occasion === "Casual") return dna.some(x=>["fresh","clean","aquatic","citrus"].includes(x)) ? "4 sprays. Easy, relaxed, and versatile." : "3 sprays. Enough presence without overdoing it.";
+  if (occasion === "Gym") return rich ? "Skip richer scents for the gym. Choose something fresher instead." : "2 to 3 light sprays max, or a very small amount if it is an oil.";
+  if (occasion === "Outdoors") return rich ? "3 to 4 sprays outside." : "4 to 5 sprays outside.";
+  if (occasion === "Evening" || occasion === "Special Event") return rich ? "4 sprays max." : "3 sprays.";
+  return "3 sprays as a safe default.";
+}
+
+function getWhyWear(f, occasion, weather){
+  const dna = dnatags(f);
+  const bits = [];
+  if (["Office","Travel","Plane","Buttoned Up","Gym"].includes(occasion)){
+    if (dna.some(x=>["clean","fresh","blue","tea","soap","citrus","musk"].includes(x))) bits.push("it smells clean, polished, and easy to wear");
+    if (dna.some(x=>["vetiver","woody","fougere","earthy","mineral"].includes(x))) bits.push("it keeps a mature edge without becoming heavy");
+    if (occasion === "Plane") bits.push("it stays lower-risk for enclosed seating");
+    if (occasion === "Gym") bits.push("it stays fresh and low-risk when heat and movement can amplify a scent");
+    if (occasion === "Buttoned Up") bits.push("it feels more dressed and put together without turning loud");
+  }
+  if (["Date","Evening","Special Event"].includes(occasion)){
+    if (dna.some(x=>["amber","musk","woody","boozy","spice"].includes(x))) bits.push("it has enough warmth and texture to feel intentional");
+  }
+  if (weather && typeof weather.temp === "number"){
+    if (weather.temp <= 55 && dna.some(x=>["woody","amber","vetiver","earthy"].includes(x))) bits.push("it fits cooler air better than an airy summer scent");
+    if (weather.temp >= 82 && dna.some(x=>["fresh","clean","citrus","aquatic"].includes(x))) bits.push("it stays more comfortable in warm weather");
+  }
+  return bits.length ? bits.join(". ") + "." : "It fits the selected occasion and conditions.";
+}
+
+function groupBy(items, keyFn){
+  const m = new Map();
+  items.forEach(item=>{ [].concat(keyFn(item)).forEach(key=>{ const k = key || "Unspecified"; if (!m.has(k)) m.set(k, []); m.get(k).push(item); }); });
+  return [...m.entries()].sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+}
+
+function getLayeringAnalysis(base, top){
+  if (!base || !top) return {score:0, verdict:"Pick two fragrances to analyze.", why:"", ratio:"", sprays:""};
+  const bd = dnatags(base), td = dnatags(top);
+  const shared = bd.filter(x=>td.includes(x));
+  const contrast = (bd.includes("fresh") && td.includes("amber")) || (bd.includes("citrus") && td.includes("woody")) || (bd.includes("blue") && td.includes("musk")) || (bd.includes("vetiver") && td.includes("citrus"));
+  const clash = (bd.includes("smoky") && td.includes("aquatic")) || (bd.includes("oud") && td.includes("airy")) || (bd.includes("gourmand") && td.includes("marine"));
+  let raw = 5 + shared.length*1.5 + (contrast?1:0) - (clash?2:0);
+  let score = Math.max(1, Math.min(10, Math.round(raw)));
+  let verdict = score>=9 ? "Excellent layering match" : score>=7 ? "Very good layering match" : score>=5 ? "Borderline combo" : "Do not layer these";
+  let ratio = score<=4 ? "Not recommended" : score>=8 ? "2 sprays base + 2 sprays top" : score>=5 ? "2 sprays base + 1 light spray top" : "2 sprays base + 1 spray top";
+  let sprays = score<=4 ? "Skip this layering combo. Wear one of them on its own instead." : score>=8 ? "Apply the base first on chest and one side of neck, then the top on the other side of neck and shirt for lift." : "Apply the base to chest and neck, then add the top fragrance lightly.";
+  let why = "";
+
+  if (score>=8) {
+    why += "This pairing is strong because the two fragrances already share enough structure to read as one intentional scent cloud instead of two separate fragrances fighting for attention. ";
+    why += "The overlap gives the blend a clean transition from opening to drydown, so the top fragrance adds dimension without breaking the identity of the base. ";
+  } else if (score>=5) {
+    why += "This pairing can work, but it needs control because the two fragrances are not naturally seamless. ";
+    why += "One side should stay in the lead, usually the base, while the second scent should behave more like an accent that adds brightness, sweetness, texture, or lift. ";
+    why += "If you spray both too heavily, the blend can lose definition and start to feel muddy, blurred, or louder than you intended. ";
+  } else {
+    why += "These two are not a strong layering match because their scent structures pull in different directions. ";
+    why += "Instead of blending into one smooth profile, they are more likely to clash in the air and create confusion between the opening, heart, and drydown. ";
+  }
+
+  if (shared.length) {
+    why += `They overlap on ${shared.join(", ")}, which gives the combination a shared backbone and helps the transition feel smoother on skin. `;
+  } else {
+    why += "They do not share much direct overlap, so balance matters even more if you decide to test them together. ";
+  }
+
+  if (contrast) {
+    why += "There is also a useful contrast here, which can make the combo more interesting when kept light. ";
+    why += "That contrast works best when the second fragrance stays supportive instead of trying to dominate the whole scent profile. ";
+  }
+
+  if (clash) {
+    why += "There is a structural clash in this pairing, so overspraying will make it feel messy very quickly. ";
+    why += "That is why the spray plan stays conservative. ";
+  }
+
+  if (score>=5 && score<=7) {
+    why += "The safest way to wear this is to let the base do most of the work, then use the top fragrance only to sharpen the opening or add a small twist. ";
+  }
+
+  return {score, verdict, why: why.trim(), ratio, sprays};
+}
+
+function getLayeringSuggestions(collection, occasion, weather){
+  if (occasion === "Plane") return [];
+  const pool = collection.filter(f=>(f.o||[]).includes(occasion));
+  const usable = pool.length ? pool : collection;
+  const weights = getWeatherAdjustedWeights(RECOMMENDATION_WEIGHTS[occasion==="Special Event"?"SpecialEvent":occasion] || {}, weather);
+  const ranked = [...usable].sort((a,b)=>scoreFragrance(b,weights,weather,"Mixed")-scoreFragrance(a,weights,weather,"Mixed"));
+  const out = [], seen = new Set();
+  for (let i=0;i<Math.min(ranked.length,12);i++) {
+    for (let j=0;j<Math.min(ranked.length,12);j++) {
+      if (i===j) continue;
+      const base = ranked[i], top = ranked[j];
+      const key = [base.n, top.n].sort().join("__");
+      if (seen.has(key)) continue;
+      const analysis = getLayeringAnalysis(base, top);
+      if (analysis.score <= 4) continue;
+      seen.add(key);
+      out.push({base, top, analysis, rank: analysis.score + scoreFragrance(base,weights,weather) + scoreFragrance(top,weights,weather)});
+    }
+  }
+  return out.sort((a,b)=>b.rank-a.rank).slice(0,6);
+}
+
+function getSeasonMode(){
+  const m = new Date().getMonth()+1;
+  if ([3,4,5].includes(m)) return "Spring";
+  if ([6,7,8].includes(m)) return "Summer";
+  if ([9,10,11].includes(m)) return "Fall";
+  return "Winter";
+}
+
+function scoreDisplay(f, season){
+  const dna = dnatags(f);
+  const s = norm(f.s);
+  let score = f.r || 0;
+
+  const has = txt => s.includes(txt.toLowerCase());
+  const boost = n => score += n;
+  const penalize = n => score -= n;
+
+  if (season==="Spring"){
+    if (has("spring")) boost(5);
+    if (has("spring · summer") || has("spring · fall")) boost(3);
+    if (has("year-round")) boost(2);
+    if (has("fall · winter")) penalize(3);
+    if (dna.some(x=>["green","fresh","citrus","clean","vetiver","tea","floral"].includes(x))) boost(2);
+    if (dna.some(x=>["dark","tobacco","oud","gourmand"].includes(x))) penalize(2);
+  }
+
+  if (season==="Summer"){
+    if (has("summer")) boost(5);
+    if (has("spring · summer")) boost(3);
+    if (has("year-round")) boost(2);
+    if (has("fall · winter")) penalize(4);
+    if (dna.some(x=>["fresh","aquatic","clean","citrus","blue","marine","green"].includes(x))) boost(2);
+    if (dna.some(x=>["dark","tobacco","oud","gourmand","boozy"].includes(x))) penalize(3);
+  }
+
+  if (season==="Fall"){
+    if (has("fall")) boost(5);
+    if (has("spring · fall") || has("fall · winter")) boost(3);
+    if (has("year-round")) boost(2);
+    if (has("spring · summer")) penalize(2);
+    if (dna.some(x=>["woody","amber","vetiver","spice","earthy","fougere"].includes(x))) boost(2);
+    if (dna.some(x=>["aquatic","marine"].includes(x))) penalize(1);
+  }
+
+  if (season==="Winter"){
+    if (has("winter")) boost(5);
+    if (has("fall · winter")) boost(3);
+    if (has("year-round")) boost(2);
+    if (has("spring · summer")) penalize(3);
+    if (dna.some(x=>["amber","woody","dark","spice","tobacco","oud","boozy","gourmand"].includes(x))) boost(2);
+    if (dna.some(x=>["aquatic","marine","citrus"].includes(x))) penalize(1);
+  }
+
+  return score;
+}
+
+function getDisplaySections(collection, season){
+  const ranked = [...collection]
+    .map(f => ({ item:f, displayScore:scoreDisplay(f, season) }))
+    .sort((a,b)=>b.displayScore-a.displayScore);
+
+  const display = ranked.slice(0,30).map(x=>x.item);
+  const anchors = [];
+  const daily = [];
+  const statement = [];
+  const used = new Set();
+
+  const add = (arr, f) => {
+    if (!f || used.has(f.n)) return;
+    used.add(f.n);
+    arr.push(f);
+  };
+
+  display.forEach(f => {
+    const dna = dnatags(f);
+    if (anchors.length < 8 && (f.r||0) >= 4) {
+      add(anchors, f);
+      return;
+    }
+    if (daily.length < 12 && dna.some(x=>["fresh","woody","clean","blue","green","vetiver","musk","tea","soap","citrus","aquatic","fougere"].includes(x))) {
+      add(daily, f);
+      return;
+    }
+    if (statement.length < 10 && dna.some(x=>["amber","dark","tobacco","spice","oud","boozy","gourmand"].includes(x))) {
+      add(statement, f);
+      return;
+    }
+  });
+
+  display.forEach(f => {
+    if (!used.has(f.n)) {
+      if (daily.length < 12) add(daily, f);
+      else if (statement.length < 10) add(statement, f);
+      else if (anchors.length < 8) add(anchors, f);
+    }
+  });
+
+  return {anchors, daily, statement, display};
+}
+
+function getCandidateOverlap(candidate, existing){
+  const cd = (candidate.d||[]).map(norm), ed = dnatags(existing);
+  const sharedDNA = cd.filter(x=>ed.includes(x));
+  const sharedOcc = (candidate.o||[]).filter(x=>(existing.o||[]).includes(x));
+  let score = sharedDNA.length*2 + sharedOcc.length;
+  if (candidate.i && existing.i && candidate.i.toLowerCase()===existing.i.toLowerCase()) score += 4;
+  if (candidate.s && existing.s && candidate.s===existing.s) score += 1;
+  return {score, sharedDNA, sharedOcc};
+}
+
+function classifyBuy(best, candidate){
+  if (!best) return {verdict:"Interesting but unclear", reason:"Not enough info to compare."};
+  if (best.overlap.score >= 9) return {verdict:"Good but redundant", reason:`It overlaps heavily with ${best.item.n}.`};
+  if (best.overlap.score >= 6) return {verdict:"Interesting but unnecessary", reason:`It still sits fairly close to ${best.item.n}.`};
+  return {verdict:"Worth considering", reason:"It looks different enough to fill a gap."};
+}
+
+async function fetchWeather(pref){
+  try {
+    if (pref.mode==="manual" && pref.city) {
+      const ge = await fetch("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(pref.city)+"&count=1&language=en&format=json").then(r=>r.json());
+      if (ge.results && ge.results[0]) {
+        const g = ge.results[0];
+        const label = g.name + (g.admin1 ? ", " + g.admin1 : "");
+        return await fetchWeatherByCoords(g.latitude, g.longitude, label);
+      }
+      return {loading:false,error:"City not found.",temp:null,wind:null,code:null,city:pref.city};
+    }
+    return new Promise(resolve=>{
+      if (!navigator.geolocation) return fetchWeatherByCoords(38.8816,-77.091,"Arlington area").then(resolve);
+      navigator.geolocation.getCurrentPosition(
+        pos=>fetchWeatherByCoords(pos.coords.latitude,pos.coords.longitude).then(resolve),
+        _=>fetchWeatherByCoords(38.8816,-77.091,"Arlington area").then(resolve),
+        {enableHighAccuracy:false, timeout:8000, maximumAge:300000}
+      );
+    });
+  } catch(e) {
+    return {loading:false,error:"Unable to load weather.",temp:null,wind:null,code:null,city:"Your area"};
+  }
+}
+
+async function fetchWeatherByCoords(lat, lon, label=""){
+  const wd = await fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,weather_code,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph").then(r=>r.json());
+  let city = label || "Your area";
+  if (!label) {
+    try {
+      const ge = await fetch("https://geocoding-api.open-meteo.com/v1/reverse?latitude="+lat+"&longitude="+lon+"&language=en&format=json").then(r=>r.json());
+      if (ge.results && ge.results[0]) city = ge.results[0].name || ge.results[0].admin1 || city;
+    } catch(e) {}
+  }
+  return {
+    loading:false,error:"",
+    temp:wd.current ? wd.current.temperature_2m : null,
+    wind:wd.current ? wd.current.wind_speed_10m : null,
+    code:wd.current ? wd.current.weather_code : null,
+    city
+  };
+}
+
+function homeView(){
+  const houses = countByHouse();
+  const pool = COLLECTION.filter(f=>(f.o||[]).includes(state.homeOccasion));
+  const source = pool.length ? pool : COLLECTION;
+  const picks = state.homeOccasion==="Plane"
+    ? getPlaneSafePicks(source, state.weather, state.homeEnvironment, 3)
+    : pickTop(source, getWeatherAdjustedWeights(RECOMMENDATION_WEIGHTS[state.homeOccasion==="Special Event"?"SpecialEvent":state.homeOccasion]||{}, state.weather), 3, state.weather, state.homeEnvironment);
+
+  return `
+  <div class="grid">
+    <div class="hero">
+      <div class="card">
+        <div class="section-title">
+          <div>
+            <div class="kicker">Live weather</div>
+            <h3>${esc(state.weather.city)}</h3>
+            <div class="muted">${state.weather.loading ? "Loading current conditions..." : (state.weather.error || getWeatherLabel(state.weather.code))}</div>
+          </div>
+          <div class="action">
+            <button class="btn" id="themeToggle">${state.theme==="dark"?"Light Mode":"Dark Mode"}</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label class="small">Weather source</label>
+            <select id="weatherMode">
+              <option value="auto" ${state.weatherPref.mode==="auto"?"selected":""}>Use current location</option>
+              <option value="manual" ${state.weatherPref.mode==="manual"?"selected":""}>Use manual city</option>
+            </select>
+          </div>
+          ${state.weatherPref.mode==="manual" ? `<div class="field"><label class="small">Manual city</label><input id="manualCity" value="${esc(state.weatherPref.city)}" placeholder="Chicago or 60601" /></div>` : ""}
+        </div>
+        <div class="grid cols-4" style="margin-top:14px">
+          <div class="stat"><div class="kicker">Temp</div><div class="num">${state.weather.temp!=null ? Math.round(state.weather.temp)+"°F" : "--"}</div></div>
+          <div class="stat"><div class="kicker">Wind</div><div class="num">${state.weather.wind!=null ? Math.round(state.weather.wind)+" mph" : "--"}</div></div>
+          <div class="stat"><div class="kicker">Condition</div><div class="num" style="font-size:18px">${esc(getWeatherLabel(state.weather.code))}</div></div>
+          <div class="stat"><div class="kicker">Theme</div><div class="num" style="font-size:18px">${state.theme==="dark"?"Dark":"Light"}</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker">Collection snapshot</div>
+        <h3>${COLLECTION.length} bottles · ${houses.length} houses</h3>
+        <div class="grid cols-2" style="margin-top:12px">
+          ${houses.slice(0,6).map(([house,count])=>`<div class="stat"><div class="smalltxt muted">${esc(house)}</div><div class="num" style="font-size:22px">${count}</div></div>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <div>
+          <div class="kicker">Quick recommendation</div>
+          <h3>Collection-first advisor</h3>
+          <div class="muted">Choose occasion and environment for three strong picks with reasoning and wear guidance.</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field"><label class="small">Occasion</label><select id="homeOccasion">${OCCASIONS.map(x=>`<option ${state.homeOccasion===x?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div class="field"><label class="small">Environment</label><select id="homeEnvironment">${ENVIRONMENTS.map(x=>`<option ${state.homeEnvironment===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      </div>
+      <div class="grid cols-3" style="margin-top:14px">
+        ${picks.map((f,i)=>`
+          <div class="card soft">
+            <div class="kicker">${getAdvisorLabel(i)}</div>
+            <h4>${esc(f.n)}</h4>
+            <div class="muted">${esc(f.h)}</div>
+            <div style="margin-top:6px">${displayDNAList(f).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div>
+            <p>${esc(getWhyWear(f, state.homeOccasion, state.weather))}</p>
+            <p><strong>Guidance:</strong> ${esc(getSprayAdvice(f, state.homeOccasion))}</p>
+            <div class="smalltxt muted">Inspired by / style: ${esc(f.i||"Original")}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+function collectionView(){
+  const filtered = !state.collectionSearch
+    ? COLLECTION
+    : COLLECTION.filter(f=>[f.n,f.h,f.i,...(f.d||[]),...(f.o||[])].join(" ").toLowerCase().includes(norm(state.collectionSearch)));
+
+  let grouped = [];
+  if (state.collectionView==="House") grouped = groupBy(filtered, f=>f.h);
+  if (state.collectionView==="DNA") grouped = groupBy(filtered, f=>displayDNAList(f));
+  if (state.collectionView==="Inspiration") grouped = groupBy(filtered, f=>f.i || "Original / Unspecified");
+  if (state.collectionView==="Occasion") grouped = groupBy(filtered, f=>displayOccasionList(f));
+  if (state.collectionView==="Plane") {
+    const plane = filtered
+      .filter(isPlaneSafeFragrance)
+      .map(f=>({...f, planeGuidance:getSprayAdvice(f,"Plane"), planeScore:scoreFragrance(f,getWeatherAdjustedWeights(RECOMMENDATION_WEIGHTS.Plane,state.weather),state.weather,"Indoors")}))
+      .sort((a,b)=>b.planeScore-a.planeScore);
+    grouped = [["Plane Safe", plane]];
+  }
+  const visible = state.collectionGroup ? grouped.filter(([g])=>g===state.collectionGroup) : grouped;
+
+  return `
+  <div class="card">
+    <div class="section-title">
+      <div>
+        <div class="kicker">Collection</div>
+        <h3>${filtered.length} shown</h3>
+      </div>
+      <div class="field" style="max-width:420px">
+        <label class="small">Search</label>
+        <input id="collectionSearch" value="${esc(state.collectionSearch)}" placeholder="Search fragrance, house, DNA, inspiration" />
+      </div>
+    </div>
+
+    <div class="subtabs">${COLLECTION_VIEWS.map(v=>`<button class="subtab ${state.collectionView===v?"active":""}" data-cview="${v}">${v}</button>`).join("")}</div>
+
+    <div class="row" style="margin-top:14px">
+      <div class="field">
+        <label class="small">Jump to ${state.collectionView}</label>
+        <select id="collectionGroup">
+          <option value="">All</option>
+          ${grouped.map(([g])=>`<option value="${esc(g)}" ${state.collectionGroup===g?"selected":""}>${esc(g)}</option>`).join("")}
+        </select>
+      </div>
+      <div class="stat" style="min-width:220px"><div class="kicker">Current group</div><div class="num" style="font-size:22px">${esc(state.collectionGroup || "All")}</div></div>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+      ${visible.map(([groupName, items])=>`
+        <div>
+          <div class="section-title">
+            <h4>${esc(groupName)}</h4>
+            <div class="muted">${items.length}</div>
+          </div>
+          <div class="grid cols-3">
+            ${items.map(f=>`
+              <button class="listbtn" data-open="${esc(f.n)}">
+                <div><strong>${esc(f.n)}</strong></div>
+                <div class="muted">${esc(f.h)}</div>
+                <div style="margin-top:6px">${displayDNAList(f).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div>
+                <div class="smalltxt muted" style="margin-top:8px">Season: ${esc(f.s||"Unspecified")}</div>
+                <div class="smalltxt muted">Inspired by / style: ${esc(f.i||"Original")}</div>
+                ${state.collectionView==="Plane" ? `<div class="smalltxt" style="margin-top:6px"><strong>Plane guidance:</strong> ${esc(f.planeGuidance||getSprayAdvice(f,"Plane"))}</div>` : ""}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  </div>`;
+}
+
+function fragranceModal(){
+  const f = state.selectedFragrance;
+  return `
+  <div class="modal-wrap" id="modalWrap">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="section-title">
+        <div>
+          <div class="kicker">Fragrance details</div>
+          <h2 style="margin:.25rem 0">${esc(f.n)}</h2>
+          <div class="muted">${esc(f.h)}</div>
+        </div>
+        <button class="btn" id="modalClose">Close</button>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="card soft"><div class="kicker">Inspired by / style</div><p>${esc(f.i||"Original")}</p></div>
+        <div class="card soft"><div class="kicker">Season</div><p>${esc(f.s||"Unspecified")}</p></div>
+        <div class="card soft"><div class="kicker">DNA Tags</div><div>${displayDNAList(f).length ? displayDNAList(f).map(x=>`<span class="pill">${esc(x)}</span>`).join("") : '<span class="muted">No DNA tags saved.</span>'}</div></div>
+        <div class="card soft"><div class="kicker">Occasions</div><p>${esc(displayOccasionList(f).join(", ") || "Unspecified")}</p></div>
+        <div class="card soft"><div class="kicker">Office / daily fit</div><p>${esc(getWhyWear(f, "Office", state.weather))}</p></div>
+        <div class="card soft"><div class="kicker">Plane guidance</div><p>${isPlaneSafeFragrance(f) ? esc(getSprayAdvice(f,"Plane")) : "Not a first-choice plane scent."}</p></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function wearTodayView(){
+  const pool = COLLECTION.filter(f=>(f.o||[]).includes(state.wearOccasion));
+  const source = pool.length ? pool : COLLECTION;
+  const picks = state.wearOccasion==="Plane"
+    ? getPlaneSafePicks(source, state.weather, state.wearEnvironment, 5)
+    : pickTop(source, getWeatherAdjustedWeights(RECOMMENDATION_WEIGHTS[state.wearOccasion==="Special Event"?"SpecialEvent":state.wearOccasion]||{}, state.weather), 5, state.weather, state.wearEnvironment);
+  const selected = COLLECTION.find(f=>f.n===state.wearSelected);
+  const guidance = selected ? getSprayAdvice(selected, state.wearOccasion) : "Select a fragrance to see wear guidance.";
+
+  return `
+  <div class="grid">
+    <div class="card">
+      <div class="section-title">
+        <div>
+          <div class="kicker">Wear today</div>
+          <h3>Top 5 picks + manual logging</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field"><label class="small">Occasion</label><select id="wearOccasion">${OCCASIONS.map(x=>`<option ${state.wearOccasion===x?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div class="field"><label class="small">Environment</label><select id="wearEnvironment">${ENVIRONMENTS.map(x=>`<option ${state.wearEnvironment===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      </div>
+      <div class="card soft" style="margin-top:14px">
+        <div class="kicker">Current conditions</div>
+        <div>${state.weather.loading ? "Loading weather..." : `${esc(state.weather.city)} · ${state.weather.temp!=null ? Math.round(state.weather.temp)+'°F' : '--'} · ${esc(getWeatherLabel(state.weather.code))}`}</div>
+      </div>
+      <div class="grid cols-2" style="margin-top:14px">
+        <div>
+          <div class="kicker">Top 5 picks</div>
+          <div class="grid" style="margin-top:10px">
+            ${picks.map((p,idx)=>`
+              <button class="listbtn" data-apply-pick="${esc(p.n)}">
+                <div class="kicker">Pick ${idx+1}</div>
+                <div><strong>${esc(p.n)}</strong></div>
+                <div class="muted">${esc(p.h)}</div>
+                <div class="smalltxt" style="margin-top:8px">${esc(getWhyWear(p, state.wearOccasion, state.weather))}</div>
+                <div class="smalltxt" style="margin-top:6px"><strong>${esc(getSprayAdvice(p, state.wearOccasion))}</strong></div>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+        <div>
+          <div class="kicker">Manual log</div>
+          <div class="field" style="margin-top:10px"><label class="small">Fragrance</label><select id="wearSelected">${COLLECTION.slice().sort((a,b)=>a.n.localeCompare(b.n)).map(f=>`<option ${state.wearSelected===f.n?"selected":""}>${esc(f.n)}</option>`).join("")}</select></div>
+          <div class="field" style="margin-top:10px"><label class="small">${isOil(selected||{}) ? "Amount to apply" : "Sprays / amount"}</label><input id="wearAmount" value="${esc(state.wearAmount)}" placeholder="${selected ? esc(guidance) : 'Enter wear amount'}" /></div>
+          <div class="card soft" style="margin-top:12px"><div class="kicker">Manual pick suggestion</div><div>${esc(guidance)}</div><div class="smalltxt muted" style="margin-top:6px">This updates when you change the fragrance or occasion.</div></div>
+          <div class="field" style="margin-top:10px"><label class="small">Notes</label><textarea id="wearNotes">${esc(state.wearNotes)}</textarea></div>
+          <div class="row" style="margin-top:12px"><button class="btn" id="saveWear">Save wear</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <div><div class="kicker">Wear history</div><h3>${state.wearLog.length} entries</h3></div>
+      </div>
+      <div class="grid">
+        ${state.wearLog.length ? state.wearLog.map(w=>`
+          <div class="card soft">
+            <div><strong>${esc(w.fragrance)}</strong></div>
+            <div class="muted">${esc(w.house||"")}</div>
+            <div class="smalltxt muted" style="margin-top:6px">Date: ${esc(w.date)} · Occasion: ${esc(w.occasion||"")}</div>
+            <div class="smalltxt" style="margin-top:6px">${esc(w.amount||"")}</div>
+            ${w.notes ? `<div class="smalltxt" style="margin-top:8px">${esc(w.notes)}</div>` : ""}
+          </div>
+        `).join("") : `<div class="muted">No wears logged yet.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function layeringView(){
+  const baseOptions = COLLECTION.filter(f=>(f.n+" "+f.h).toLowerCase().includes(norm(state.layerBaseQuery)));
+  const topOptions = COLLECTION.filter(f=>(f.n+" "+f.h).toLowerCase().includes(norm(state.layerTopQuery)));
+  const base = COLLECTION.find(f=>f.n===state.layerBase);
+  const top = COLLECTION.find(f=>f.n===state.layerTop);
+  const analysis = getLayeringAnalysis(base, top);
+  const suggestions = getLayeringSuggestions(COLLECTION, state.layerOccasion, state.weather);
+
+  return `
+  <div class="grid">
+    <div class="card">
+      <div class="kicker">Layering advisor</div>
+      <h3>Manual combo analysis</h3>
+      <div class="row">
+        <div class="field"><label class="small">Base search</label><input id="layerBaseQuery" value="${esc(state.layerBaseQuery)}" /></div>
+        <div class="field"><label class="small">Top search</label><input id="layerTopQuery" value="${esc(state.layerTopQuery)}" /></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="field"><label class="small">Base fragrance</label><select id="layerBase">${baseOptions.map(f=>`<option ${state.layerBase===f.n?"selected":""}>${esc(f.n)}</option>`).join("")}</select></div>
+        <div class="field"><label class="small">Top fragrance</label><select id="layerTop">${topOptions.map(f=>`<option ${state.layerTop===f.n?"selected":""}>${esc(f.n)}</option>`).join("")}</select></div>
+      </div>
+    </div>
+
+    <div class="grid cols-3">
+      <div class="stat"><div class="kicker">Synergy score</div><div class="num">${analysis.score}/10</div><div class="score ${analysis.score>=7?'good':analysis.score>=5?'warn':'bad'}">${esc(analysis.verdict)}</div></div>
+      <div class="stat"><div class="kicker">Ratio</div><div style="font-size:20px;font-weight:700">${esc(analysis.ratio)}</div></div>
+      <div class="stat"><div class="kicker">Spray plan</div><div>${esc(analysis.sprays)}</div></div>
+    </div>
+
+    <div class="card">
+      <div class="kicker">Why this works</div>
+      <p>${esc(analysis.why)}</p>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <div>
+          <div class="kicker">Suggestion box</div>
+          <h3>Weather and occasion based</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field"><label class="small">Occasion</label><select id="layerOccasion">${OCCASIONS.map(x=>`<option ${state.layerOccasion===x?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div class="field"><label class="small">Environment</label><select id="layerEnvironment">${ENVIRONMENTS.map(x=>`<option ${state.layerEnvironment===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      </div>
+      <div class="smalltxt muted" style="margin-top:10px">${state.weather.loading ? "Loading weather..." : `${esc(state.weather.city)} · ${state.weather.temp!=null ? Math.round(state.weather.temp)+'°F' : '--'} · ${getWeatherLabel(state.weather.code)} · ${state.layerEnvironment}`}</div>
+      <div class="grid cols-3" style="margin-top:12px">
+        ${suggestions.length ? suggestions.map((s,i)=>`
+          <div class="card soft">
+            <div class="kicker">Suggestion ${i+1}</div>
+            <div class="smalltxt muted">Base</div><div><strong>${esc(s.base.n)}</strong></div>
+            <div class="smalltxt muted" style="margin-top:8px">Top</div><div><strong>${esc(s.top.n)}</strong></div>
+            <div class="smalltxt muted" style="margin-top:8px">Ratio</div><div>${esc(s.analysis.ratio)}</div>
+            <div class="smalltxt muted" style="margin-top:8px">Guidance</div><div>${esc(s.analysis.sprays)}</div>
+            <div class="smalltxt muted" style="margin-top:8px">Why</div><div class="smalltxt">${esc(s.analysis.why)}</div>
+          </div>
+        `).join("") : `<div class="muted">No strong layering suggestion available for this weather and occasion.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function displayView(){
+  const auto = getSeasonMode();
+  const active = state.displaySeasonMode==="Auto" ? auto : state.displaySeasonMode;
+  const seasons = ["Spring","Summer","Fall","Winter"];
+  const all = Object.fromEntries(seasons.map(s=>[s, getDisplaySections(COLLECTION,s)]));
+  const activeSections = all[active];
+
+  return `
+  <div class="grid">
+    <div class="card">
+      <div class="section-title">
+        <div>
+          <div class="kicker">Display planner</div>
+          <h3>Seasonal 30-bottle shelves</h3>
+        </div>
+        <div class="field" style="max-width:240px">
+          <label class="small">Season mode</label>
+          <select id="displaySeasonMode">
+            <option ${state.displaySeasonMode==="Auto"?"selected":""}>Auto</option>
+            ${seasons.map(s=>`<option ${state.displaySeasonMode===s?"selected":""}>${s}</option>`).join("")}
+          </select>
+        </div>
+      </div>
+      <div class="grid cols-4">
+        <div class="stat"><div class="kicker">Active season</div><div class="num">${active}</div></div>
+        ${seasons.map(s=>`<div class="stat"><div class="kicker">${s}</div><div class="num">${all[s].display.length}</div></div>`).join("")}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="kicker">Active display summary</div>
+      <div class="grid cols-3" style="margin-top:10px">
+        <div class="stat"><div class="kicker">Anchors</div><div class="num">${activeSections.anchors.length}</div></div>
+        <div class="stat"><div class="kicker">Daily Drivers</div><div class="num">${activeSections.daily.length}</div></div>
+        <div class="stat"><div class="kicker">Statement Pieces</div><div class="num">${activeSections.statement.length}</div></div>
+      </div>
+    </div>
+
+    ${seasons.map(season=>["Anchors","Daily Drivers","Statement Pieces"].map(title=>{
+      const items = title==="Anchors" ? all[season].anchors : title==="Daily Drivers" ? all[season].daily : all[season].statement;
+      const note = title==="Anchors" ? "Your strongest seasonal core bottles." : title==="Daily Drivers" ? "Easy reaches for regular wear." : "Distinctive bottles that round out the shelf.";
+      return `
+      <div class="card">
+        <div class="kicker">${season} · ${title}</div>
+        <div class="muted">${note}</div>
+        <div class="grid cols-3" style="margin-top:12px">
+          ${items.map(f=>`
+            <div class="card soft">
+              <div><strong>${esc(f.n)}</strong></div>
+              <div class="muted">${esc(f.h)}</div>
+              <div style="margin-top:6px">${displayDNAList(f).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div>
+              <div class="smalltxt muted" style="margin-top:8px">Season: ${esc(f.s||"")}</div>
+            </div>
+          `).join("")}
+        </div>
+      </div>`;
+    }).join("")).join("")}
+  </div>`;
+}
+
+function buySkipView(){
+  const candidate = {
+    n: state.buy.name.trim(),
+    h: state.buy.house.trim(),
+    i: state.buy.inspiration.trim(),
+    d: state.buy.dna.split(",").map(x=>x.trim()).filter(Boolean),
+    o: state.buy.occasions.split(",").map(x=>x.trim()).filter(Boolean),
+    s: state.buy.season
+  };
+  const ranked = (!candidate.n && !candidate.i && !candidate.d.length)
+    ? []
+    : COLLECTION.map(item=>({item, overlap:getCandidateOverlap(candidate,item)})).sort((a,b)=>b.overlap.score-a.overlap.score).slice(0,5);
+  const best = ranked[0];
+  const decision = classifyBuy(best, candidate);
+
+  return `
+  <div class="grid">
+    <div class="card">
+      <div class="kicker">Buy or Skip</div>
+      <h3>Gap fill or redundancy check</h3>
+      <div class="row">
+        <div class="field"><label class="small">Fragrance name</label><input id="buyName" value="${esc(state.buy.name)}" /></div>
+        <div class="field"><label class="small">House</label><input id="buyHouse" value="${esc(state.buy.house)}" /></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="field"><label class="small">Inspired by / style</label><input id="buyInspo" value="${esc(state.buy.inspiration)}" /></div>
+        <div class="field"><label class="small">Season</label><select id="buySeason">${["All Season","Spring","Summer","Fall","Winter","Year-round"].map(x=>`<option ${state.buy.season===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="field"><label class="small">DNA tags</label><input id="buyDNA" value="${esc(state.buy.dna)}" placeholder="fresh, woody, citrus, aquatic" /></div>
+        <div class="field"><label class="small">Occasions</label><input id="buyOccasions" value="${esc(state.buy.occasions)}" placeholder="Office, Casual, Date" /></div>
+      </div>
+    </div>
+
+    <div class="grid cols-3">
+      <div class="stat"><div class="kicker">Verdict</div><div class="num" style="font-size:24px">${esc(decision.verdict)}</div><div>${esc(decision.reason)}</div></div>
+      <div class="stat"><div class="kicker">Closest match</div><div class="num" style="font-size:24px">${best ? esc(best.item.n) : "—"}</div><div class="muted">${best ? esc(best.item.h) : ""}</div><div style="margin-top:6px">Overlap score: ${best ? best.overlap.score : "—"}</div></div>
+      <div class="stat"><div class="kicker">Why</div><div>${best ? `Shared DNA: ${best.overlap.sharedDNA.join(", ")||"none"}. Shared occasions: ${best.overlap.sharedOcc.join(", ")||"none"}.` : "Add candidate details to compare it."}</div></div>
+    </div>
+
+    <div class="card">
+      <div class="kicker">Top overlaps</div>
+      <div class="grid cols-3" style="margin-top:12px">
+        ${ranked.length ? ranked.map(({item,overlap})=>`
+          <div class="card soft">
+            <div><strong>${esc(item.n)}</strong></div>
+            <div class="muted">${esc(item.h)}</div>
+            <div class="smalltxt" style="margin-top:8px">Overlap score: ${overlap.score}</div>
+            <div class="smalltxt muted">DNA overlap: ${esc(overlap.sharedDNA.join(", ") || "none")}</div>
+            <div class="smalltxt muted">Occasion overlap: ${esc(overlap.sharedOcc.join(", ") || "none")}</div>
+          </div>
+        `).join("") : `<div class="muted">Add a fragrance name plus some DNA or inspiration info.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  document.documentElement.setAttribute("data-theme", state.theme==="light" ? "light" : "dark");
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <div class="sticky">
+      <div class="topbar">
+        <div class="brand">
+          <small>The Vault</small>
+          <h1>AJ’s Fragrance Collection</h1>
+          <p>${COLLECTION.length} loaded · premium single-file app</p>
+        </div>
+        <div class="row" style="align-items:center">
+          <button class="btn action" id="themeToggle">${state.theme==="dark"?"Light Mode":"Dark Mode"}</button>
+          <div class="tabs">${TABS.map(t=>`<button class="tab ${state.tab===t?"active":""}" data-tab="${t}">${t}</button>`).join("")}</div>
+        </div>
+      </div>
+    </div>
+
+    ${state.tab==="Home" ? homeView() : ""}
+    ${state.tab==="Collection" ? collectionView() : ""}
+    ${state.tab==="Wear Today" ? wearTodayView() : ""}
+    ${state.tab==="Layering" ? layeringView() : ""}
+    ${state.tab==="Display" ? displayView() : ""}
+    ${state.tab==="Buy or Skip" ? buySkipView() : ""}
+    ${state.selectedFragrance ? fragranceModal() : ""}
+
+    <div class="footer-note">Designed as a one-file iPhone-friendly web app with light and dark mode, weather-aware logic, and collection-first fragrance guidance.</div>
+  `;
+  bindEvents();
+}
+
+function bindValue(id, fn){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.oninput = el.onchange = e => fn(e.target.value);
+}
+
+function bindEvents(){
+  const themeToggle = document.getElementById("themeToggle");
+  if (themeToggle) themeToggle.onclick = ()=>{ state.theme = state.theme==="dark" ? "light" : "dark"; saveTheme(); render(); };
+
+  document.querySelectorAll("[data-tab]").forEach(el=> el.onclick = ()=>{ state.tab = el.dataset.tab; render(); });
+  document.querySelectorAll("[data-cview]").forEach(el=> el.onclick = ()=>{ state.collectionView = el.dataset.cview; state.collectionGroup=""; render(); });
+  document.querySelectorAll("[data-open]").forEach(el=> el.onclick = ()=>{ state.selectedFragrance = COLLECTION.find(f=>f.n===el.dataset.open) || null; render(); });
+
+  const modalClose = document.getElementById("modalClose");
+  if (modalClose) modalClose.onclick = ()=>{ state.selectedFragrance=null; render(); };
+  const modalWrap = document.getElementById("modalWrap");
+  if (modalWrap) modalWrap.onclick = ()=>{ state.selectedFragrance=null; render(); };
+
+  bindValue("weatherMode", v=>{ state.weatherPref.mode=v; saveWeatherPref(); loadWeather(); });
+  bindValue("manualCity", v=>{ state.weatherPref.city=v; saveWeatherPref(); });
+  const manualCity = document.getElementById("manualCity");
+  if (manualCity) manualCity.onchange = ()=> loadWeather();
+
+  bindValue("homeOccasion", v=>{ state.homeOccasion=v; render(); });
+  bindValue("homeEnvironment", v=>{ state.homeEnvironment=v; render(); });
+
+  bindValue("collectionSearch", v=>{ state.collectionSearch=v; render(); });
+  bindValue("collectionGroup", v=>{ state.collectionGroup=v; render(); });
+
+  bindValue("wearOccasion", v=>{ state.wearOccasion=v; render(); });
+  bindValue("wearEnvironment", v=>{ state.wearEnvironment=v; render(); });
+  bindValue("wearSelected", v=>{ state.wearSelected=v; if(!state.wearAmount){ const f=COLLECTION.find(x=>x.n===v); if(f) state.wearAmount=getSprayAdvice(f,state.wearOccasion); } render(); });
+  bindValue("wearAmount", v=>{ state.wearAmount=v; });
+  bindValue("wearNotes", v=>{ state.wearNotes=v; });
+
+  document.querySelectorAll("[data-apply-pick]").forEach(el=> el.onclick = ()=>{
+    const pick = COLLECTION.find(f=>f.n===el.dataset.applyPick);
+    if (!pick) return;
+    state.wearSelected = pick.n;
+    state.wearAmount = getSprayAdvice(pick, state.wearOccasion);
+    if (!state.wearNotes) state.wearNotes = `Generated pick for ${state.wearOccasion}.`;
+    render();
+  });
+
+  const saveWearBtn = document.getElementById("saveWear");
+  if (saveWearBtn) saveWearBtn.onclick = ()=>{
+    const selected = COLLECTION.find(f=>f.n===state.wearSelected);
+    if (!selected) return;
+    state.wearLog.unshift({
+      date:new Date().toISOString().slice(0,10),
+      fragrance:selected.n,
+      house:selected.h,
+      occasion:state.wearOccasion,
+      amount:state.wearAmount || getSprayAdvice(selected, state.wearOccasion),
+      notes:state.wearNotes.trim()
+    });
+    saveWearLog();
+    state.wearNotes="";
+    render();
+  };
+
+  bindValue("layerBaseQuery", v=>{ state.layerBaseQuery=v; render(); });
+  bindValue("layerTopQuery", v=>{ state.layerTopQuery=v; render(); });
+  bindValue("layerBase", v=>{ state.layerBase=v; render(); });
+  bindValue("layerTop", v=>{ state.layerTop=v; render(); });
+  bindValue("layerOccasion", v=>{ state.layerOccasion=v; render(); });
+  bindValue("layerEnvironment", v=>{ state.layerEnvironment=v; render(); });
+
+  bindValue("displaySeasonMode", v=>{ state.displaySeasonMode=v; render(); });
+
+  bindValue("buyName", v=>{ state.buy.name=v; render(); });
+  bindValue("buyHouse", v=>{ state.buy.house=v; render(); });
+  bindValue("buyInspo", v=>{ state.buy.inspiration=v; render(); });
+  bindValue("buyDNA", v=>{ state.buy.dna=v; render(); });
+  bindValue("buyOccasions", v=>{ state.buy.occasions=v; render(); });
+  bindValue("buySeason", v=>{ state.buy.season=v; render(); });
+}
+
+async function loadWeather(){
+  state.weather = {loading:true,error:"",temp:null,wind:null,code:null,city:state.weatherPref.mode==="manual" ? (state.weatherPref.city||"Manual city") : "Your area"};
+  render();
+  state.weather = await fetchWeather(state.weatherPref);
+  render();
+}
+
+loadWeather();
+render();
+</script>
+</body>
+</html>
